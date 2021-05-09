@@ -1,0 +1,7 @@
+
+
+// Simple program to count to 10 starting from 0
+// now it doesnt do that anymore and is just a test file :)
+.main
+    ldr r1 (r3)+3
+    str r1 3000

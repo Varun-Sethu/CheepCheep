@@ -8,10 +8,9 @@ const SYS	  uint8 = 0x0
   const RET   uint8 = 0xee // return from a subroutine
   const CLR	  uint8 = 0xe0  // clear the screen
 
-// http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#00E0
 
 // Control flow operations
-const JMP 	  uint8 = 0x10 // jump
+const JMP 	  uint8 = 0x10 // jump to nnn
 const CALL	  uint8 = 0x20 // calls a sub routine
 const SE      uint8 = 0x30 // skip next instruction if Vx = kk (3xKK)
 const SNEK    uint8 = 0x40 // skip next instruction if Vx != kk
@@ -31,7 +30,7 @@ const DISP	  uint8 = 0xD0 // display to the screen
 // Loading into chip8 state
 const LDC     uint8 = 0xF0 // load into important registers within the chip8
   const LFDT   uint8 = 0x7 // load contents from  delay timer into VX
-  const PSE    uint8 = 0xA // wait for a key press and load into Vx
+  const PSE    uint8 = 0xA // wait for a key press and load into Vx -> unimplemented
   const LDT    uint8 = 0x15 // load the value of Vx into the DT
   const LDS    uint8 = 0x18 // load the value of Vx into the sound timer
   const ADDI   uint8 = 0x1E // set IR += Vx
