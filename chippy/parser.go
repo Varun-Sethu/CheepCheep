@@ -141,6 +141,7 @@ func validateSyntaxAndResolveTokens(tokens []token) (bool, error) {
 				for i, paramEntity := range token.tokenParams {
 					isValidAddress, paramEntity := determineAddressingMode(paramEntity)
 					token.tokenParams[i] = paramEntity
+
 					if !isValidAddress {
 						return false, fmt.Errorf("%d: the adressing mode of \"%s\" is unclear", token.lineNumber, paramEntity.rawData)
 					// if we are expecting addresses, just ensure they are of the correct type
@@ -195,12 +196,12 @@ func determineAddressingMode(parameter param) (bool, param) {
 	} else if paramData := RegIndirectR.FindStringSubmatch(rawParam); len(paramData) != 0 {
 		parameter.addressData = paramData[1:]
 		parameter.addressingMode = REGINDIRECT
-	} else if paramData := RelativeR.FindStringSubmatch(rawParam); len(paramData) != 0 {
-		parameter.addressData = paramData[1:]
-		parameter.addressingMode = RELATIVE
 	} else if paramData := IndexedR.FindStringSubmatch(rawParam); len(paramData) != 0 {
 		parameter.addressData = paramData[1:]
 		parameter.addressingMode = INDEXED
+	} else if paramData := IndexScaledR.FindStringSubmatch(rawParam); len(paramData) != 0 {
+		parameter.addressData = paramData[1:]
+		parameter.addressingMode = INDEXSCALED
 	} else {
 		return false, parameter
 	}

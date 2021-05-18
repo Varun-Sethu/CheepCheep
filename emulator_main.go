@@ -1,21 +1,14 @@
 package main
 
-import (
-	"chip8/emulator"
-)
+import "chip8/emulator"
 
 
-
-// yes.
 func main() {
 	chip := emulator.NewChip()
-	chip.LoadROM("IBMLogo.ch8")
-	//chip.DumpMemory()
+	chip.LoadROM("print_ten.chip")
 
-	// infinite loooop :)
+	// forEVAAAA :)
 	for {
-		command := chip.Fetch()
-		chip.Tick(command)
+		chip.PerformNextComputation()
 	}
 }
-// 0b11100000

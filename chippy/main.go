@@ -23,7 +23,7 @@ import (
 
 
 // ParseAndCompile takes a source chippy file, parses it and generates the corresponding bytecode
-func ParseAndCompile(fileName string, saveAs string) {
+func ParseAndCompile(fileName string, saveAs string, printSymbolTable bool) {
 	file, err := os.OpenFile(fileName, os.O_RDONLY, 0777)
 	defer file.Close()
 	if err != nil {
@@ -43,10 +43,14 @@ func ParseAndCompile(fileName string, saveAs string) {
 	// Create a file called "saveAs"
 	output, _ := os.Create(fmt.Sprintf("%s.chip", saveAs))
 	defer output.Close()
-	compilationErr := CompileTokens(fileName, output, tokens)
+	symtable, compilationErr := CompileTokens(fileName, output, tokens)
 	if compilationErr != nil {
 		fmt.Print(compilationErr.Error())
 		return
+	}
+
+	if printSymbolTable {
+		fmt.Printf("The computed symtable was: %v\n", symtable)
 	}
 
 }

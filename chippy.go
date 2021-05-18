@@ -4,6 +4,7 @@ package main
 import (
 	"chip8/chippy"
 	"os"
+	"strconv"
 )
 
 
@@ -16,5 +17,10 @@ import (
 func main() {
 	sourceFile := os.Args[1]
 	requestedOutputFile := os.Args[2]
-	chippy.ParseAndCompile(sourceFile, requestedOutputFile)
+	printSymbolTable, err := strconv.ParseBool(os.Args[3])
+	if err != nil {
+		printSymbolTable = false
+	}
+
+	chippy.ParseAndCompile(sourceFile, requestedOutputFile,  printSymbolTable)
 }

@@ -1,7 +1,8 @@
+ldr r1 #0
 
+.loopStart
+    add r1 #1
+    print r1
 
-// Simple program to count to 10 starting from 0
-// now it doesnt do that anymore and is just a test file :)
-.main
-    ldr r1 (r3)+3
-    str r1 3000
+cmp r1 #10
+jmpl .loopStart
