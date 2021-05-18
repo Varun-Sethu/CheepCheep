@@ -77,25 +77,55 @@ func (c *Chipster) LoadROM(sourceFile string) {
 
 }
 
+
+
+
 // TODO: fix up addressing mode logic
 
+// computeOperand determines what values should be inputted into the operation, note its only called by functions
+// that support multiple addressing modes, additionally; depending on the function, the amount of desired "bytes" in the
+// operand is provided: eg. if the operand is expected to be an address (like jump commands) then it requests 2 bytes
+// along with the value we just computed we return how many bytes were "used" to get that value from the code segment
+func (c *Chipster) computeOperand(addrMode uint8, requestedBytes uint16) (uint16, uint16) {
 
-
-// resolveParams retrieves the next set of parameters for an operation given the addressing mode, also returns the amount
-// of consumed bytes.
-func (c *Chipster) resolveParams(addrMode uint8, currentOffset uint16) (uint16, uint16) {
-	// Note: this retrieves the VALUE "pointed" at by the addrMode
+	// First compute the physical location in memory specified by the addressing mode, if we are accessing a register
+	// just flick its flag
+	var memoryLocation uint16 = c.Pc
+	var usedBytes uint16 = requestedBytes
+	var isRegisterAccess bool = false
 
 	switch addrMode {
 		case immediate:
-			return uint16(c.Memory[c.Pc + currentOffset]), 1
+			break
 		case direct:
-			var requestedAddr uint16 = uint16(c.Memory[c.Pc + currentOffset]) << 8 | uint16(c.Memory[c.Pc + 1 + currentOffset])
-			return uint16(c.Memory[requestedAddr]), 2
+			memoryLocation = uint16(c.Memory[c.Pc]) << 8 | uint16(c.Memory[c.Pc + 1])
+			usedBytes = 2
+			break
+		case indirect:
+			baseLocation := uint16(c.Memory[c.Pc]) << 8 | uint16(c.Memory[c.Pc + 1])
+			memoryLocation = uint16(c.Memory[baseLocation]) << 8 | uint16(c.Memory[baseLocation + 1])
+			usedBytes = 2
+			break
 		case registerDirect:
-			return uint16(c.Registers[c.Memory[c.Pc + currentOffset]]), 1
-		default:
-			return 0, 0
+			memoryLocation = uint16(c.Memory[c.Pc])
+			isRegisterAccess = true
+			break
+	}
+
+	// Now resolve and compute the operand data
+	if isRegisterAccess {
+		return uint16(c.Registers[memoryLocation]), usedBytes
+	} else {
+		// 2 possible situations: if the requested bytes was a single value or if the requested byte was 2 bytes
+		// 2 bytes implies we read the next two values, otherwise we read a single value
+		var highByte uint8 = 0
+		var lowByte uint8  = c.Memory[c.Pc]
+		if requestedBytes == 2 {
+			highByte = c.Memory[c.Pc]
+			lowByte = c.Memory[c.Pc + 1]
+		}
+
+		return uint16(highByte) << 8 | uint16(lowByte), usedBytes
 	}
 }
 
@@ -110,46 +140,51 @@ func (c *Chipster) PerformNextComputation() {
 	var currentInstruction uint8 = c.Memory[c.Pc]
 	var opcode   uint8 = (currentInstruction & (0xf8)) >> 3
 	var addrMode uint8 = currentInstruction & 0x7
-
-
-	// represents how many bytes of memory the instruction we are current processing took up
-	var consumedBytes uint16 = 1
+	c.Pc += 1
 
 	switch opcode {
 		case PRINT:
 			// Fetch the next byte from memory
-			var targetRegister uint8 = c.Memory[c.Pc + consumedBytes]
+			var targetRegister uint8 = c.Memory[c.Pc]
+			c.Pc += 1
 			fmt.Printf("Outputted: %d\n", c.Registers[targetRegister])
-			consumedBytes += 1
 			break
 
 		case LDR:
-			var targetRegister uint8 = c.Memory[c.Pc + consumedBytes]
-			consumedBytes += 1
+			// fetch the target register
+			var targetRegister uint8 = c.Memory[c.Pc]
+			c.Pc += 1
 
-			loadValue, operandBytes := c.resolveParams(addrMode, consumedBytes)
+			// fetch the operand and increment the program counter
+			loadValue, usedBytes := c.computeOperand(addrMode, 1)
 			c.Registers[targetRegister] = uint8(loadValue)
-			consumedBytes += operandBytes
+			c.Pc += usedBytes
+
 			break
 
 		case ADD:
-			var targetRegister uint8 = c.Memory[c.Pc + consumedBytes]
-			consumedBytes += 1
+			// fetch the target register
+			var targetRegister uint8 = c.Memory[c.Pc]
+			c.Pc += 1
 
-			loadValue, operandBytes := c.resolveParams(addrMode, consumedBytes)
-			c.Registers[targetRegister] += uint8(loadValue)
-			consumedBytes += operandBytes
+			// fetch the operand and increment the program counter
+			additiveValue, usedBytes := c.computeOperand(addrMode, 1)
+			c.Registers[targetRegister] += uint8(additiveValue)
+			c.Pc += usedBytes
+
 			break
 
 		case CMP:
-			// read the values from memory
-			var targetRegister uint8 = c.Memory[c.Pc + consumedBytes]
-			consumedBytes += 1
-			loadValue, operandBytes := c.resolveParams(addrMode, consumedBytes)
-			consumedBytes += operandBytes
+			// fetch the target register
+			var targetRegister uint8 = c.Memory[c.Pc]
+			c.Pc += 1
+
+			// fetch the operand and increment the program counter
+			valueToCompare, usedBytes := c.computeOperand(addrMode, 1)
+			c.Pc += usedBytes
 
 			// compare the two values and based on the result of the comparison, set the corresponding flag register
-			var comparison int8 = int8(c.Registers[targetRegister]) - int8(loadValue)
+			var comparison int8 = int8(c.Registers[targetRegister]) - int8(valueToCompare)
 			c.Vf &= 0xfffc // unset the last two bits in the flag register
 			switch {
 				case comparison == 0:
@@ -168,24 +203,23 @@ func (c *Chipster) PerformNextComputation() {
 		case JMPL:
 			// Read from the flag registers, since its JMPL the final two bits should read: 10
 			var flagRegister uint16 = c.Vf & 0x3
+			jumpDestination, consumedBytes := c.computeOperand(addrMode, 2)
+			c.Pc += consumedBytes
+
 			if flagRegister == 0x2 {
 				// Perform the jump to the requested location
 				// we shouldn't increment the bytes we consumed during a jump instruction
-				var requestedAddr uint16 = uint16(c.Memory[c.Pc + consumedBytes]) << 8 | uint16(c.Memory[c.Pc + 1 + consumedBytes])
-				c.Pc = requestedAddr
+				c.Pc = jumpDestination
 				return
 			}
 
 			break
 
 		case HLT:
-			//fmt.Printf("Unidenfitied opcode: %08b\n", opcode)
+			//fmt.Printf("Unidentified opcode: %08b\n", opcode)
+			c.Pc -= 1
 			return
 	}
-
-
-	// increment the program counter based on the amount of consumed bytes
-	c.Pc += consumedBytes
 }
 
 

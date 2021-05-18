@@ -6,3 +6,4 @@ ldr r1 #0
 
 cmp r1 #10
 jmpl .loopStart
+hlt

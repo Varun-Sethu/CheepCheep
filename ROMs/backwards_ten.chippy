@@ -1,0 +1,9 @@
+ldr r1 #10
+
+.loopBody
+    sub r1 #1
+    print r1
+
+cmp r1 0
+jmpg .loopBody
+hlt
