@@ -1,11 +1,16 @@
 package main
 
-import "chip8/emulator"
+import (
+	"chip8/emulator"
+	"fmt"
+	"os"
+)
 
 
 func main() {
 	chip := emulator.NewChip()
-	chip.LoadROM("print_ten.chip")
+	sourceRom := fmt.Sprintf("%s.chip", os.Args[1])
+	chip.LoadROM(sourceRom)
 
 	// forEVAAAA :)
 	for {

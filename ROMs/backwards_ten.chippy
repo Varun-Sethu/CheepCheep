@@ -6,4 +6,5 @@ ldr r1 #10
 
 cmp r1 0
 jmpg .loopBody
-hlt
+.loop
+    jmp .loop
