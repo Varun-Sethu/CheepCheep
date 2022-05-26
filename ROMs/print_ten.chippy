@@ -1,10 +1,10 @@
-ldr r1 #0
+ldr $r1, #0
 
 .loopStart
-    add r1 #1
-    print r1
+    add $r1, #1
+    print $r1
 
-cmp r1 #10
+cmp $r1, $r2
 jmpl .loopStart
 .loop
-    jmp .loop
+    jmp .loopStart

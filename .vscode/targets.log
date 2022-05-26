@@ -1,0 +1,308 @@
+make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 4.2.1
+# Built for x86_64-pc-linux-gnu
+# Copyright (C) 1988-2016 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+
+# Make data base, printed on Fri May 27 01:04:45 2022
+
+# Variables
+
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# automatic
+?F = $(notdir $?)
+# environment
+WSLENV = VSCODE_WSL_EXT_LOCATION/up
+# default
+.SHELLFLAGS := -c
+# environment
+VSCODE_LOG_NATIVE = false
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# automatic
+@F = $(notdir $@)
+# makefile
+CURDIR := /home/varun/dev/CheepCheep
+# makefile
+SHELL = /bin/sh
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en","availableLanguages":{}}
+# environment
+_ = /home/varun/.vscode-server/bin/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5/node
+# environment
+OS161_TOOLS = /home/varun/cs3231/tools/bin
+# makefile (from 'Makefile', line 1)
+MAKEFILE_LIST :=  Makefile
+# environment
+GO111MODULE = on
+# 'override' directive
+GNUMAKEFLAGS := 
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+VSCODE_VERBOSE_LOGGING = true
+# makefile (from 'Makefile', line 3)
+ROM_DIR = ./ROMs
+# makefile (from 'Makefile', line 2)
+EMULATOR_NAME = emulator.out
+# environment
+VSCODE_CWD = /mnt/c/Users/varun/AppData/Local/Programs/Microsoft VS Code
+# environment
+GOPROXY = https://proxy.golang.org,direct
+# default
+MAKE_HOST := x86_64-pc-linux-gnu
+# environment
+PATH = /usr/local/go-1.18/bin:/home/varun/.vscode-server/bin/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5/bin/remote-cli:/home/varun/.zinit/plugins/tj---git-extras:/home/varun/.zinit/plugins/vim---vim:/home/varun/.zinit/plugins/docker---compose:/home/varun/.zinit/polaris/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/Common Files/Oracle/Java/javapath:/mnt/c/Program Files (x86)/Common Files/Oracle/Java/javapath:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/ProgramData/DockerDesktop/version-bin:/mnt/c/Program Files (x86)/dotnet/:/mnt/c/Program Files/dotnet/:/mnt/c/Users/varun/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/varun/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/varun/AppData/Local/GitHubDesktop/bin:/home/varun/cs3231/bin:/home/varun/cs3231/tools/bin
+# environment
+LSCOLORS = Gxfxcxdxbxegedabagacad
+# environment
+WinHome = /mnt/c/Users/varun/linux
+# environment
+GOPATH = /home/varun/go:/home/varun/dev/go
+# makefile (from 'Makefile', line 1)
+ASSEMBLER_NAME = chippy.out
+# environment
+VSCODE_LOG_STACK = false
+# environment
+VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-6309e4ed-0cbb-4eea-8bbb-63e5542b7f6c.sock
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
+# environment
+LS_COLORS = ow=01;36;40
+# automatic
+%F = $(notdir $%)
+# environment
+GOBIN = /usr/local/go-1.18/bin
+# environment
+DISPLAY = 172.27.240.1:0
+# environment
+VSCODE_PIPE_LOGGING = true
+# environment
+PWD = /home/varun/dev/CheepCheep
+# default
+.LOADED := 
+# environment
+WSL_INTEROP = /run/WSL/5978_interop
+# environment
+GOMODCACHE = /home/varun/go/pkg/mod
+# environment
+HOME = /home/varun
+# environment
+LOGNAME = varun
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+# automatic
++F = $(notdir $+)
+# environment
+ZSH = /home/varun/.oh-my-zsh
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# environment
+MAKELEVEL := 0
+# default
+MAKE = $(MAKE_COMMAND)
+# default
+MAKECMDGOALS := all
+# environment
+SHLVL = 0
+# default
+MAKE_VERSION := 4.2.1
+# environment
+USER = varun
+# makefile
+.DEFAULT_GOAL := emulator
+# environment
+NAME = DESKTOP-D5DJ3K5
+# environment
+LESS = -R
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# makefile (from 'Makefile', line 4)
+ROM_OUT_DIR = ./binaries
+# environment
+VSCODE_WSL_EXT_LOCATION = /mnt/c/Users/varun/.vscode/extensions/ms-vscode-remote.remote-wsl-0.66.3
+# default
+MAKE_COMMAND := make
+# environment
+ZPFX = /home/varun/.zinit/polaris
+# environment
+OLDPWD = /mnt/c/Users/varun/AppData/Local/Programs/Microsoft VS Code
+# environment
+ZSH_CACHE_DIR = /home/varun/.oh-my-zsh/cache
+# default
+.VARIABLES := 
+# automatic
+*F = $(notdir $*)
+# makefile
+MAKEFLAGS = pqrR
+# environment
+MFLAGS = -pqrR
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# environment
+BROWSER = /mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe
+# environment
+VSCODE_HANDLES_SIGPIPE = true
+# environment
+PMSPEC = 0uUpiPsf
+# default
+MAKEFILES := 
+# automatic
+<F = $(notdir $<)
+# environment
+LIBGL_ALWAYS_INDIRECT = 0
+# environment
+PAGER = less
+# environment
+LC_ALL = C
+# environment
+HOSTTYPE = x86_64
+# automatic
+^F = $(notdir $^)
+# default
+SUFFIXES := 
+# default
+.INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
+# default
+.RECIPEPREFIX := 
+# environment
+LANG = C
+# environment
+TERM = xterm-256color
+# environment
+VSCODE_EXTHOST_WILL_SEND_SOCKET = true
+# environment
+WSL_DISTRO_NAME = Ubuntu-20.04
+# environment
+OS161 = /home/varun/cs3231/bin
+# variable set hash-table stats:
+# Load=87/1024=8%, Rehash=0, Collisions=9/116=8%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (device 2064, inode 42800): 13 files, no impossibilities.
+
+# 13 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+all: assembler emulator
+#  Command line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/4=0%
+
+.PHONY: emulator clean
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-05-25 18:50:30.48
+#  File has been updated.
+#  Successfully updated.
+
+assembler:
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: ''
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := assembler
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := 
+# automatic
+# | := 
+# automatic
+# < := 
+# automatic
+# ^ := 
+# automatic
+# ? := 
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/12=8%
+#  recipe to execute (from 'Makefile', line 11):
+	go build -o ${ASSEMBLER_NAME} chippy.go
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+emulator:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 8):
+	go build -o ${EMULATOR_NAME} emulator.go
+
+clean:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 20):
+	-rm -f binaries/*.chip
+	-rm ${EMULATOR_NAME}
+	-rm ${ASSEMBLER_NAME}
+
+roms: assembler
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 16):
+	$(foreach file, $(wildcard $(ROM_DIR)/*), ./${ASSEMBLER_NAME} ${file} binaries/$(basename $(notdir $(file))) false;)	
+
+# files hash-table stats:
+# Load=9/1024=1%, Rehash=0, Collisions=0/29=0%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 1 (0) / strings = 22 / storage = 178 B / avg = 8 B
+# current buf: size = 8162 B / used = 178 B / count = 22 / avg = 8 B
+
+# strcache performance: lookups = 42 / hit rate = 47%
+# hash-table stats:
+ 
+# Load=22/8192=0%, Rehash=0, Collisions=1/42=2%
+# Finished Make data base on Fri May 27 01:04:45 2022
+
+ 

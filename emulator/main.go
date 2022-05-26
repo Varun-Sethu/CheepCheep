@@ -118,9 +118,6 @@ func (c *Chipster) computeOperand(addrMode uint8, requestedBytes uint16) (uint16
 	}
 }
 
-
-
-
 // PerformNextComputation reads the current instruction from memory and performs the dictated instruction
 func (c *Chipster) PerformNextComputation() {
 
@@ -132,191 +129,176 @@ func (c *Chipster) PerformNextComputation() {
 
 	switch {
 
+	case opcode == PRINT:
+		// Fetch the next byte from memory
+		var targetRegister uint8 = c.Memory[c.Pc]
+		c.Pc += 1
+		fmt.Printf("Outputted: %d\n", c.Registers[targetRegister])
+		break
 
-		case opcode == PRINT:
-			// Fetch the next byte from memory
-			var targetRegister uint8 = c.Memory[c.Pc]
-			c.Pc += 1
-			fmt.Printf("Outputted: %d\n", c.Registers[targetRegister])
+	// memory storage routines
+	case opcode == LDR:
+		// fetch the target register
+		var targetRegister uint8 = c.Memory[c.Pc]
+		c.Pc += 1
+
+		// fetch the operand and increment the program counter
+		loadValue, usedBytes := c.computeOperand(addrMode, 1)
+		c.Registers[targetRegister] = uint8(loadValue)
+		c.Pc += usedBytes
+		break
+	case opcode == STR:
+		// do the usual fetching of the target register
+		var targetRegister uint8 = c.Memory[c.Pc]
+		c.Pc += 1
+
+		// fetch the operand and increment the program counter
+		locationToStore, usedBytes := c.computeOperand(addrMode, 2)
+		c.Memory[locationToStore] = c.Registers[targetRegister]
+		c.Pc += usedBytes
+		break
+
+	// if the operation is of the form:
+	// 01xxx then it is an alu operation
+	// ALU operations
+	case (opcode&ALU)>>3 == 1:
+		// fetch the operand data
+		var targetRegister uint8 = c.Memory[c.Pc]
+		c.Pc += 1
+		op, usedBytes := c.computeOperand(addrMode, 1)
+		operandVal := uint8(op)
+		c.Pc += usedBytes
+
+		// decode the ALU operation and perform the appropriate instruction
+		var aluOp uint8 = opcode & 0x7
+		switch aluOp {
+		case ADD:
+			c.Registers[targetRegister] += operandVal
 			break
+		case SUB:
+			var willBeNegative bool = (c.Registers[targetRegister] - operandVal) < 0
+			c.Registers[targetRegister] -= operandVal
 
-		// memory storage routines
-		case opcode == LDR:
-			// fetch the target register
-			var targetRegister uint8 = c.Memory[c.Pc]
-			c.Pc += 1
-
-			// fetch the operand and increment the program counter
-			loadValue, usedBytes := c.computeOperand(addrMode, 1)
-			c.Registers[targetRegister] = uint8(loadValue)
-			c.Pc += usedBytes
-			break
-		case opcode == STR:
-			// do the usual fetching of the target register
-			var targetRegister uint8 = c.Memory[c.Pc]
-			c.Pc += 1
-
-			// fetch the operand and increment the program counter
-			locationToStore, usedBytes := c.computeOperand(addrMode, 2)
-			c.Memory[locationToStore] = c.Registers[targetRegister]
-			c.Pc += usedBytes
-			break
-
-
-
-
-
-		// if the operation is of the form:
-		// 01xxx then it is an alu operation
-		// ALU operations
-		case (opcode & ALU) >> 3 == 1:
-			// fetch the operand data
-			var targetRegister uint8 = c.Memory[c.Pc]
-			c.Pc += 1
-			op, usedBytes := c.computeOperand(addrMode, 1)
-			operandVal := uint8(op)
-			c.Pc += usedBytes
-
-			// decode the ALU operation and perform the appropriate instruction
-			var aluOp uint8 = opcode & 0x7
-			switch aluOp {
-				case ADD:
-					c.Registers[targetRegister] += operandVal
-					break
-				case SUB:
-					var willBeNegative bool = (c.Registers[targetRegister] - operandVal) < 0
-					c.Registers[targetRegister] -= operandVal
-
-					// set the appropriate flags
-					if willBeNegative {
-						c.Vf &= 0xfffc // unset the last two bits in the flag register
-						c.Vf |= 0x2    // set last two bits to 10
-					}
-					break
-				case MUL:
-					c.Registers[targetRegister] *= operandVal
-					break
-				case DIV:
-					if operandVal != 0 {
-						c.Registers[targetRegister] /= operandVal
-					} else {
-						c.Vf &= 0xfffb // unset the 3rd last bit in the flag register
-						c.Vf |= 0x4    // set the 3rd last bit to 1
-					}
-					break
-				case XOR:
-					c.Registers[targetRegister] ^= operandVal
-					break
-				case AND:
-					c.Registers[targetRegister] &= operandVal
-					break
-				case OR:
-					c.Registers[targetRegister] |= operandVal
-					break
-				case NOT:
-					c.Registers[targetRegister] = operandVal
-					break
-			}
-
-
-
-
-
-
-
-		// the compare operation compares a operand and a target register, modifying the flag register
-		// accordingly
-		case opcode == CMP:
-			// fetch the target register
-			var targetRegister uint8 = c.Memory[c.Pc]
-			c.Pc += 1
-
-			// fetch the operand and increment the program counter
-			valueToCompare, usedBytes := c.computeOperand(addrMode, 1)
-			c.Pc += usedBytes
-
-			// compare the two values and based on the result of the comparison, set the corresponding flag register
-			var comparison int8 = int8(c.Registers[targetRegister]) - int8(valueToCompare)
-			c.Vf &= 0xfffc // unset the last two bits in the flag register
-			switch {
-				case comparison == 0:
-					c.Vf |= 0x1 // set the last two bits to the appropriate value, in this case 01
-					break
-				case comparison < 0:
-					c.Vf |= 0x2 // set last two bits to 10
-					break
-				case comparison > 0:
-					// do nothing :)
-					break
-				}
-			break
-
-
-
-		// the following contains the set of jump instructions
-		// this is an awful messy implementation
-		case opcode == JMPL:
-			// Read from the flag registers, since its JMPL the final two bits should read: 10
-			var flagRegister uint16 = c.Vf & 0x3
-			jumpDestination, consumedBytes := c.computeOperand(addrMode, 2)
-			c.Pc += consumedBytes
-
-			if flagRegister == 0x2 {
-				// Perform the jump to the requested location
-				// we shouldn't increment the bytes we consumed during a jump instruction
-				c.Pc = jumpDestination
-				return
+			// set the appropriate flags
+			if willBeNegative {
+				c.Vf &= 0xfffc // unset the last two bits in the flag register
+				c.Vf |= 0x2    // set last two bits to 10
 			}
 			break
-		case opcode == JMPG:
-			// Read from the flag registers, since its JMPG the final two bits should read: 00
-			var flagRegister uint16 = c.Vf & 0x3
-			jumpDestination, consumedBytes := c.computeOperand(addrMode, 2)
-			c.Pc += consumedBytes
-
-			if flagRegister == 0x0 {
-				// Perform the jump to the requested location
-				// we shouldn't increment the bytes we consumed during a jump instruction
-				c.Pc = jumpDestination
-				return
+		case MUL:
+			c.Registers[targetRegister] *= operandVal
+			break
+		case DIV:
+			if operandVal != 0 {
+				c.Registers[targetRegister] /= operandVal
+			} else {
+				c.Vf &= 0xfffb // unset the 3rd last bit in the flag register
+				c.Vf |= 0x4    // set the 3rd last bit to 1
 			}
 			break
-		case opcode == JMP:
-			jumpDestination, _ := c.computeOperand(addrMode, 2)
+		case XOR:
+			c.Registers[targetRegister] ^= operandVal
+			break
+		case AND:
+			c.Registers[targetRegister] &= operandVal
+			break
+		case OR:
+			c.Registers[targetRegister] |= operandVal
+			break
+		case NOT:
+			c.Registers[targetRegister] = operandVal
+			break
+		}
+
+	// the compare operation compares a operand and a target register, modifying the flag register
+	// accordingly
+	case opcode == CMP:
+		// fetch the target register
+		var targetRegister uint8 = c.Memory[c.Pc]
+		c.Pc += 1
+
+		// fetch the operand and increment the program counter
+		valueToCompare, usedBytes := c.computeOperand(addrMode, 1)
+		c.Pc += usedBytes
+
+		// compare the two values and based on the result of the comparison, set the corresponding flag register
+		var comparison int8 = int8(c.Registers[targetRegister]) - int8(valueToCompare)
+		c.Vf &= 0xfffc // unset the last two bits in the flag register
+		switch {
+		case comparison == 0:
+			c.Vf |= 0x1 // set the last two bits to the appropriate value, in this case 01
+			break
+		case comparison < 0:
+			c.Vf |= 0x2 // set last two bits to 10
+			break
+		case comparison > 0:
+			// do nothing :)
+			break
+		}
+		break
+
+	// the following contains the set of jump instructions
+	// this is an awful messy implementation
+	case opcode == JMPL:
+		// Read from the flag registers, since its JMPL the final two bits should read: 10
+		var flagRegister uint16 = c.Vf & 0x3
+		jumpDestination, consumedBytes := c.computeOperand(addrMode, 2)
+		c.Pc += consumedBytes
+
+		if flagRegister == 0x2 {
+			// Perform the jump to the requested location
+			// we shouldn't increment the bytes we consumed during a jump instruction
 			c.Pc = jumpDestination
-			break
-		case opcode == JMPLE:
-			// Read from the flag registers, since its JMPLE the final two bits should read: 11
-			var flagRegister uint16 = c.Vf & 0x3
-			jumpDestination, consumedBytes := c.computeOperand(addrMode, 2)
-			c.Pc += consumedBytes
-
-			if flagRegister == 0x3 {
-				// Perform the jump to the requested location
-				// we shouldn't increment the bytes we consumed during a jump instruction
-				c.Pc = jumpDestination
-				return
-			}
-			break
-		case opcode == JMPGE:
-			// Read from the flag registers, since its JMPGE the final two bits should read: 01
-			var flagRegister uint16 = c.Vf & 0x3
-			jumpDestination, consumedBytes := c.computeOperand(addrMode, 2)
-			c.Pc += consumedBytes
-
-			if flagRegister == 0x1 {
-				// Perform the jump to the requested location
-				// we shouldn't increment the bytes we consumed during a jump instruction
-				c.Pc = jumpDestination
-				return
-			}
-			break
-
-
-
-		case opcode == HLT:
-			//fmt.Printf("Unidentified opcode: %08b\n", opcode)
-			c.Pc -= 1
 			return
+		}
+		break
+	case opcode == JMPG:
+		// Read from the flag registers, since its JMPG the final two bits should read: 00
+		var flagRegister uint16 = c.Vf & 0x3
+		jumpDestination, consumedBytes := c.computeOperand(addrMode, 2)
+		c.Pc += consumedBytes
+
+		if flagRegister == 0x0 {
+			// Perform the jump to the requested location
+			// we shouldn't increment the bytes we consumed during a jump instruction
+			c.Pc = jumpDestination
+			return
+		}
+		break
+	case opcode == JMP:
+		jumpDestination, _ := c.computeOperand(addrMode, 2)
+		c.Pc = jumpDestination
+		break
+	case opcode == JMPLE:
+		// Read from the flag registers, since its JMPLE the final two bits should read: 11
+		var flagRegister uint16 = c.Vf & 0x3
+		jumpDestination, consumedBytes := c.computeOperand(addrMode, 2)
+		c.Pc += consumedBytes
+
+		if flagRegister == 0x3 {
+			// Perform the jump to the requested location
+			// we shouldn't increment the bytes we consumed during a jump instruction
+			c.Pc = jumpDestination
+			return
+		}
+		break
+	case opcode == JMPGE:
+		// Read from the flag registers, since its JMPGE the final two bits should read: 01
+		var flagRegister uint16 = c.Vf & 0x3
+		jumpDestination, consumedBytes := c.computeOperand(addrMode, 2)
+		c.Pc += consumedBytes
+
+		if flagRegister == 0x1 {
+			// Perform the jump to the requested location
+			// we shouldn't increment the bytes we consumed during a jump instruction
+			c.Pc = jumpDestination
+			return
+		}
+		break
+
+	case opcode == HLT:
+		//fmt.Printf("Unidentified opcode: %08b\n", opcode)
+		c.Pc -= 1
+		return
 	}
 }

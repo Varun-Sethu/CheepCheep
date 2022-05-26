@@ -1,0 +1,5 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/varun/dev/CheepCheep'
+go build -o emulator.out emulator.go
+make: Leaving directory '/home/varun/dev/CheepCheep'
+ 

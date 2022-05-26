@@ -13,21 +13,30 @@ TODO: implement
 
 #### Addressing modes
 Memory locations within the system can be addressed in several ways, in bytecode the addressing mode is specified by a
-3 bit integer following the opcode, below is a table of the various addressing modes and their syntax within the assembler  
+2 bit integer following the opcode, below is a table of the various addressing modes and their syntax within the assembler  
 
 |  Addressing Mode  | Syntax      | Encoding |
-|       ---         |    ---      |    ---   |
-|    Immediate      |   #x        |```000``` | 
-|    Direct         |   x         |```001``` |
-|    Indirect       |  (x)        |```010``` |
-| Register Direct   |   rx        |```011``` |
-| Register Indirect |  (rx)       |```100``` |
-| Indexed Register  |  x+rx       |```101``` |
-| Indexed Scaled    |  x+k*rx     |```110``` |
-
-There are 7 independent states requiring 3 bits of information to encode.
+|       ---         |    ---      |   ---    |
+| Immediate/Default |    #x       | ```00``` | 
+|    Register       |    $rx      | ```01``` |
+| Register Relative |    x+$rx    | ```10``` |
+|    PC Relative    |   #(x)      | ```11``` |
 
 #### Instructions
-Instructions have a relatively simple encoding in memory, the first 5 bits refers to the opcode, the following 3 refers to the addressing mode and every byte to follow are
-the arguments for the instruction. For example the instruction: ```ldr r1 r15``` is encoded as: ```0x0b010f```
-in memory, in binary this is: ```0b 00001011 00000001 00001111```.
+Instructs and operands consist of 4 bytes. The first byte is the instruction and the following 3 bytes are the operands. For the instruction byte the first 2 bits is the addressing mode and the final 6 are the the opcode. As an example conider the add instruction with immediate and register addressing.
+`add $t1 $t2 $t3` will map to `01 <add op code>` while `add $t1 $t2 #4` maps to `00 <add op code>`.
+
+#### Memory Layout
+There are $2^{16}$ unique addresses on this machine hence to have an address thats an argument we require 2 bytes.
+
+#### Sample Code
+```x86
+add $r1, $r2, $r3
+add $r1, $r2, #4
+
+.label
+    jmp .label
+```
+This architecture has 13 registers, 1 register for the stack pointer, 1 register for the output of compare instructions and a zero register that contains the number 0. All of this are integer registers and the machine doesn't support floating point operations.
+
+In code the first 13 registers are addressed with `$r[1 -- 13]` while the stack/cmp/zero register are addressed as `$sp, $cmp, $zero`.
